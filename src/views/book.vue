@@ -106,7 +106,7 @@ export default {
       }
     },
     setTheme (index) {
-      this.defaultTheme = 0
+      this.defaultTheme = index
       this.rendition.themes.select(this.themeList[index].name)
     }
   }
