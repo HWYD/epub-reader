@@ -2,7 +2,7 @@
   <div class="menu-wrapper">
     <transition name="slide">
       <div class="book-menu" :class="{'noboxshadow': childMenuShow || !menushow }" v-show="menushow">
-        <div><span class="iconfont icon-xianxingtubiaozhizuomoban-39 icon"></span></div>
+        <div @click="toggleContent"><span class="iconfont icon-xianxingtubiaozhizuomoban-39 icon"></span></div>
         <div @click="toggleSet(2)"><span class="iconfont icon-progress icon"></span></div>
         <div @click="toggleSet(1)"><span class="iconfont icon-brightj2 icon"></span></div>
         <div @click="toggleSet(0)"><span class="icon">A</span></div>
@@ -37,12 +37,21 @@
         </div>
       </div>
     </transition>
+    <book-content :navigation ="navigation" @goContent="goContent" class="book-content" v-show="contentShow"></book-content>
+    <transition name="fade">
+      <div class="content-mask" v-show="contentShow" @click="hideContent">
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
+import BookContent from '@/components/content/content'
 export default {
   name: 'bookMenu',
+  components: {
+    BookContent
+  },
   props: {
     menushow: {
       type: Boolean,
@@ -60,14 +69,21 @@ export default {
         return []
       }
     },
-    defaultTheme: Number
+    defaultTheme: Number,
+    navigation: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
   },
   data () {
     return {
       childMenuShow: false,
       selectFont: 2,
       showTag: 0,
-      progress: 0
+      progress: 0,
+      contentShow: false
     }
   },
   methods: {
@@ -92,6 +108,17 @@ export default {
     },
     progressInput (e) {
       this.progress = e.target.value
+    },
+    toggleContent () {
+      this.contentShow = true
+    },
+    hideContent () {
+      this.contentShow = false
+    },
+    goContent (href) {
+      this.$emit('goContent', href)
+      this.hideContent()
+      this.hideChildMenu()
     }
   }
 }

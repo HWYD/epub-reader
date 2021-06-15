@@ -11,16 +11,18 @@
               :fontSizeList = fontSizeList
               :themeList = "themeList"
               :defaultTheme="defaultTheme"
+              :navigation="navigation"
               @setFontSize ="setFontSize"
               @setTheme="setTheme"
-              @progressChange="setProgress">
+              @progressChange="setProgress"
+              @goContent="goContent">
     </book-menu>
   </div>
 </template>
 
 <script>
 import Epub from 'epubjs'
-import BookMenu from '@/components/book-menu'
+import BookMenu from '@/components/menu/book-menu'
 export default {
   name: 'book',
   components: {
@@ -93,6 +95,7 @@ export default {
       })
       this.book.ready.then(() => {
         this.navigation = this.book.navigation
+        console.log(this.navigation, 111)
         return this.book.locations.generate()
       }).then(res => {
         this.locations = this.book.locations
@@ -124,6 +127,10 @@ export default {
       const per = e / 100
       const location = per > 0 ? this.locations.cfiFromPercentage(per) : 0
       this.rendition.display(location)
+    },
+    goContent (href) {
+      this.rendition.display(href)
+      this.menuShow = false
     }
   }
 }
