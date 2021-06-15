@@ -3,7 +3,7 @@
     <transition name="slide">
       <div class="book-menu" :class="{'noboxshadow': childMenuShow || !menushow }" v-show="menushow">
         <div><span class="iconfont icon-xianxingtubiaozhizuomoban-39 icon"></span></div>
-        <div><span class="iconfont icon-progress icon"></span></div>
+        <div @click="toggleSet(2)"><span class="iconfont icon-progress icon"></span></div>
         <div @click="toggleSet(1)"><span class="iconfont icon-brightj2 icon"></span></div>
         <div @click="toggleSet(0)"><span class="icon">A</span></div>
       </div>
@@ -30,6 +30,10 @@
             <div class="bg--box" :style="{background:item.style.body.background}" :class="{'bg-border':item.style.body.background ==='#fff'}"></div>
             <div class="bg-des" :class="{'default-desc':defaultTheme === index }">{{item.name}}</div>
           </div>
+        </div>
+        <div class="progress-setting" v-if="showTag === 2">
+          <input type="range" min ="0" max = "100" step="1" class="progress" @change ="progressChange" @input="progressInput"/>
+          <div class="range-tip"><span>{{progress+'%'}}</span></div>
         </div>
       </div>
     </transition>
@@ -62,7 +66,8 @@ export default {
     return {
       childMenuShow: false,
       selectFont: 2,
-      showTag: 0
+      showTag: 0,
+      progress: 0
     }
   },
   methods: {
@@ -81,6 +86,12 @@ export default {
     },
     setTheme (index) {
       this.$emit('setTheme', index)
+    },
+    progressChange (e) {
+      this.$emit('progressChange', e.target.value)
+    },
+    progressInput (e) {
+      this.progress = e.target.value
     }
   }
 }

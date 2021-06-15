@@ -12,7 +12,8 @@
               :themeList = "themeList"
               :defaultTheme="defaultTheme"
               @setFontSize ="setFontSize"
-              @setTheme="setTheme">
+              @setTheme="setTheme"
+              @progressChange="setProgress">
     </book-menu>
   </div>
 </template>
@@ -73,7 +74,10 @@ export default {
           }
         }
       ],
-      defaultTheme: 0
+      defaultTheme: 0,
+      navigation: {},
+      locations: '',
+      bookAvailable: false
     }
   },
   mounted () {
@@ -82,10 +86,17 @@ export default {
   methods: {
     showBook () {
       this.book = new Epub('/山海经.epub')
-      this.rendition = this.book.renderTo('reader', { width: window.innerWidth, height: window.innerHeight })
+      this.rendition = this.book.renderTo('reader', { width: window.innerWidth, height: window.innerHeight, method: 'default' })
       this.rendition.display()
       this.themeList.forEach(item => {
         this.rendition.themes.register(item.name, item.style)
+      })
+      this.book.ready.then(() => {
+        this.navigation = this.book.navigation
+        return this.book.locations.generate()
+      }).then(res => {
+        this.locations = this.book.locations
+        this.bookAvailable = true
       })
     },
     prePage () {
@@ -108,6 +119,11 @@ export default {
     setTheme (index) {
       this.defaultTheme = index
       this.rendition.themes.select(this.themeList[index].name)
+    },
+    setProgress (e) {
+      const per = e / 100
+      const location = per > 0 ? this.locations.cfiFromPercentage(per) : 0
+      this.rendition.display(location)
     }
   }
 }
