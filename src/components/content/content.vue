@@ -45,6 +45,7 @@ export default {
    height: 50px;
    padding-top: 30px;
    padding-left: 10px;
+   cursor: pointer;
   }
   .line{
     width: 100%;
@@ -52,5 +53,4 @@ export default {
     background: rgba(0,0,0,.1);
   }
 }
-
 </style>

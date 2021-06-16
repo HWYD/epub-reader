@@ -13,6 +13,7 @@
     >div{
     flex: 1;
     @include flex-center;
+    cursor: pointer;
     }
     &.noboxshadow{
       box-shadow: none;
@@ -42,6 +43,7 @@
           flex: 1;
           display: flex;
           align-items: center;
+          cursor: pointer;
           &:first-child{
             .line{
               &:first-child{
@@ -104,6 +106,7 @@
         color: #ccc;
         .bg--box{
           height: 35px;
+          cursor: pointer;
         }
         .bg-des{
           text-align: center;

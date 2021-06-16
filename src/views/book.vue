@@ -1,7 +1,7 @@
 <template>
   <div class="book-wrapper">
     <div id="reader" ></div>
-    <div class="mask">
+    <div class="mask" ref="maskRef">
       <div class="left" @click="prePage"></div>
       <div class="center" @click="toggleMenu"></div>
       <div class="right" @click="nextPage"></div>
@@ -80,15 +80,18 @@ export default {
   setup (props, context) {
     onMounted(() => {
       showBook()
+      gestureSwitch()
     })
+
     const { fontSizeList, themeList } = setVal()
-    const book = reactive({})
+    const book = ref({})
     const rendition = ref({})
     const menuShow = ref(false)
     const defaultTheme = ref(0)
-    const navigation = reactive({})
-    const locations = reactive({})
+    const navigation = ref({})
+    const locations = ref({})
     const bookAvailable = ref(false)
+    const maskRef = ref(null)
     const bookMenuRef = ref(null)
 
     const showBook = () => {
@@ -135,7 +138,7 @@ export default {
 
     const setProgress = (e) => {
       const per = e / 100
-      const location = per > 0 ? locations.cfiFromPercentage(per) : 0
+      const location = per > 0 ? locations.value.cfiFromPercentage(per) : 0
       rendition.value.display(location)
     }
 
@@ -144,8 +147,27 @@ export default {
       menuShow.value = false
     }
 
+    // 添加手势滑动进行翻页
+    const gestureSwitch = () => {
+      let touchStartX, startTime
+      maskRef.value.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].clientX
+        startTime = e.timeStamp
+      })
+      maskRef.value.addEventListener('touchend', e => {
+        const offsetX = e.changedTouches[0].clientX - touchStartX
+        const durTime = e.timeStamp - startTime
+        if (offsetX > 40 && durTime < 500) {
+          prePage()
+        }
+        if (offsetX < -40 && durTime < 500) {
+          nextPage()
+        }
+        e.stopPropagation()
+      })
+    }
+
     return {
-      bookMenuRef,
       book,
       rendition,
       menuShow,
@@ -155,14 +177,17 @@ export default {
       navigation,
       locations,
       bookAvailable,
+      maskRef,
       showBook,
+      bookMenuRef,
       prePage,
       nextPage,
       toggleMenu,
       setFontSize,
       setTheme,
       setProgress,
-      goContent
+      goContent,
+      gestureSwitch
     }
   }
 }
