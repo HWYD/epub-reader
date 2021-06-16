@@ -1,7 +1,7 @@
 <template>
   <transition name="slideH">
     <div class="content-wrapper">
-      <div v-for="item in navigation.toc" :key="item">
+      <div v-for="(item,index) in navigation.toc" :key="index">
         <div class="content-txt" @click="goContent(item.href)">{{item.label}}</div>
         <div class="line"></div>
       </div>
@@ -18,9 +18,12 @@ export default {
       default: () => { return {} }
     }
   },
-  methods: {
-    goContent (href) {
-      this.$emit('goContent', href)
+  setup (props, { emit }) {
+    const goContent = function (href) {
+      emit('goContent', href)
+    }
+    return {
+      goContent
     }
   }
 }

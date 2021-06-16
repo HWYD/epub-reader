@@ -1,12 +1,12 @@
 <template>
   <div class="book-wrapper">
-    <div id="reader"></div>
+    <div id="reader" ></div>
     <div class="mask">
       <div class="left" @click="prePage"></div>
       <div class="center" @click="toggleMenu"></div>
       <div class="right" @click="nextPage"></div>
     </div>
-    <book-menu ref="bookMenu"
+    <book-menu ref="bookMenuRef"
               :menushow="menuShow"
               :fontSizeList = fontSizeList
               :themeList = "themeList"
@@ -23,114 +23,146 @@
 <script>
 import Epub from 'epubjs'
 import BookMenu from '@/components/menu/book-menu'
+import { ref, reactive, onMounted } from 'vue'
+
+const setVal = () => {
+  const fontSizeList = reactive([
+    { fontSize: 12 },
+    { fontSize: 14 },
+    { fontSize: 16 },
+    { fontSize: 18 },
+    { fontSize: 20 },
+    { fontSize: 22 },
+    { fontSize: 24 }
+  ])
+  const themeList = reactive([
+    {
+      name: 'default',
+      style: {
+        body: {
+          color: '#000', background: '#fff'
+        }
+      }
+    },
+    {
+      name: 'eye',
+      style: {
+        body: {
+          color: '#000', background: '#ceeaba'
+        }
+      }
+    },
+    {
+      name: 'night',
+      style: {
+        body: {
+          color: '#fff', background: '#000'
+        }
+      }
+    },
+    {
+      name: 'gold',
+      style: {
+        body: {
+          color: '#000', background: 'rgb(241, 236, 226)'
+        }
+      }
+    }
+  ])
+  return { fontSizeList, themeList }
+}
+
 export default {
   name: 'book',
   components: {
     BookMenu
   },
-  data () {
-    return {
-      book: '',
-      rendition: '',
-      menuShow: false,
-      fontSizeList: [
-        { fontSize: 12 },
-        { fontSize: 14 },
-        { fontSize: 16 },
-        { fontSize: 18 },
-        { fontSize: 20 },
-        { fontSize: 22 },
-        { fontSize: 24 }
-      ],
-      themeList: [
-        {
-          name: 'default',
-          style: {
-            body: {
-              color: '#000', background: '#fff'
-            }
-          }
-        },
-        {
-          name: 'eye',
-          style: {
-            body: {
-              color: '#000', background: '#ceeaba'
-            }
-          }
-        },
-        {
-          name: 'night',
-          style: {
-            body: {
-              color: '#fff', background: '#000'
-            }
-          }
-        },
-        {
-          name: 'gold',
-          style: {
-            body: {
-              color: '#000', background: 'rgb(241, 236, 226)'
-            }
-          }
-        }
-      ],
-      defaultTheme: 0,
-      navigation: {},
-      locations: '',
-      bookAvailable: false
-    }
-  },
-  mounted () {
-    this.showBook()
-  },
-  methods: {
-    showBook () {
-      this.book = new Epub('/山海经.epub')
-      this.rendition = this.book.renderTo('reader', { width: window.innerWidth, height: window.innerHeight, method: 'default' })
-      this.rendition.display()
-      this.themeList.forEach(item => {
-        this.rendition.themes.register(item.name, item.style)
+  setup (props, context) {
+    onMounted(() => {
+      showBook()
+    })
+    const { fontSizeList, themeList } = setVal()
+    const book = reactive({})
+    const rendition = ref({})
+    const menuShow = ref(false)
+    const defaultTheme = ref(0)
+    const navigation = reactive({})
+    const locations = reactive({})
+    const bookAvailable = ref(false)
+    const bookMenuRef = ref(null)
+
+    const showBook = () => {
+      book.value = new Epub('/山海经.epub')
+      rendition.value = book.value.renderTo('reader', { width: window.innerWidth, height: window.innerHeight, method: 'default' })
+      rendition.value.display()
+      themeList.forEach(item => {
+        rendition.value.themes.register(item.name, item.style)
       })
-      this.book.ready.then(() => {
-        this.navigation = this.book.navigation
-        console.log(this.navigation, 111)
-        return this.book.locations.generate()
+      book.value.ready.then(() => {
+        navigation.value = book.value.navigation
+        return book.value.locations.generate()
       }).then(res => {
-        this.locations = this.book.locations
-        this.bookAvailable = true
+        locations.value = book.value.locations
+        bookAvailable.value = true
       })
-    },
-    prePage () {
-      this.rendition.prev()
-    },
-    nextPage () {
-      this.rendition.next()
-    },
-    toggleMenu () {
-      this.menuShow = !this.menuShow
-      if (!this.menuShow) {
-        this.$refs.bookMenu.hideChildMenu()
+    }
+
+    const prePage = () => {
+      rendition.value.prev()
+    }
+
+    const nextPage = () => {
+      rendition.value.next()
+    }
+
+    const toggleMenu = () => {
+      menuShow.value = !menuShow.value
+      if (!menuShow.value) {
+        bookMenuRef.value.hideChildMenu()
       }
-    },
-    setFontSize (fontSize) {
-      if (this.rendition.themes) {
-        this.rendition.themes.fontSize(fontSize + 'px')
+    }
+
+    const setFontSize = (fontSize) => {
+      if (rendition.value.themes) {
+        rendition.value.themes.fontSize(fontSize + 'px')
       }
-    },
-    setTheme (index) {
-      this.defaultTheme = index
-      this.rendition.themes.select(this.themeList[index].name)
-    },
-    setProgress (e) {
+    }
+
+    const setTheme = (index) => {
+      defaultTheme.value = index
+      rendition.value.themes.select(themeList[index].name)
+    }
+
+    const setProgress = (e) => {
       const per = e / 100
-      const location = per > 0 ? this.locations.cfiFromPercentage(per) : 0
-      this.rendition.display(location)
-    },
-    goContent (href) {
-      this.rendition.display(href)
-      this.menuShow = false
+      const location = per > 0 ? locations.cfiFromPercentage(per) : 0
+      rendition.value.display(location)
+    }
+
+    const goContent = (href) => {
+      rendition.value.display(href)
+      menuShow.value = false
+    }
+
+    return {
+      bookMenuRef,
+      book,
+      rendition,
+      menuShow,
+      fontSizeList,
+      themeList,
+      defaultTheme,
+      navigation,
+      locations,
+      bookAvailable,
+      showBook,
+      prePage,
+      nextPage,
+      toggleMenu,
+      setFontSize,
+      setTheme,
+      setProgress,
+      goContent
     }
   }
 }

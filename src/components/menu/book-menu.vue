@@ -2,7 +2,7 @@
   <div class="menu-wrapper">
     <transition name="slide">
       <div class="book-menu" :class="{'noboxshadow': childMenuShow || !menushow }" v-show="menushow">
-        <div @click="toggleContent"><span class="iconfont icon-xianxingtubiaozhizuomoban-39 icon"></span></div>
+        <div @click="openContent"><span class="iconfont icon-xianxingtubiaozhizuomoban-39 icon"></span></div>
         <div @click="toggleSet(2)"><span class="iconfont icon-progress icon"></span></div>
         <div @click="toggleSet(1)"><span class="iconfont icon-brightj2 icon"></span></div>
         <div @click="toggleSet(0)"><span class="icon">A</span></div>
@@ -13,9 +13,9 @@
         <div class="font-setting" v-if="showTag === 0">
           <div class="preview" :style="{fontSize:fontSizeList[0].fontSize+'px'}">A</div>
           <div class="font-select">
-             <div class="select-wrapper" v-for="(item,index) in fontSizeList" :key="index">
+             <div class="select-wrapper" v-for="(item,index) in fontSizeList" :key="index" @click="setFontSize(index)">
                 <div class="line"></div>
-                <div class="point-wrapper" @click="setFontSize(index)">
+                <div class="point-wrapper">
                   <div class="point" v-show="selectFont ==index">
                     <div class="small-point"></div>
                   </div>
@@ -47,6 +47,7 @@
 
 <script>
 import BookContent from '@/components/content/content'
+import { ref } from 'vue'
 export default {
   name: 'bookMenu',
   components: {
@@ -77,48 +78,73 @@ export default {
       }
     }
   },
-  data () {
-    return {
-      childMenuShow: false,
-      selectFont: 2,
-      showTag: 0,
-      progress: 0,
-      contentShow: false
-    }
-  },
-  methods: {
-    toggleSet (tag) {
-      if (this.showTag === tag || !this.childMenuShow) {
-        this.childMenuShow = !this.childMenuShow
+
+  emits: ['setFontSize', 'setTheme', 'progressChange', 'goContent'],
+
+  setup (props, { emit }) {
+    const childMenuShow = ref(false)
+    const selectFont = ref(2)
+    const showTag = ref(0)
+    const progress = ref(0)
+    const contentShow = ref(false)
+
+    const toggleSet = (tag) => {
+      if (showTag.value === tag || !childMenuShow.value) {
+        childMenuShow.value = !childMenuShow.value
       }
-      this.showTag = tag
-    },
-    hideChildMenu () {
-      this.childMenuShow = false
-    },
-    setFontSize (index) {
-      this.selectFont = index
-      this.$emit('setFontSize', this.fontSizeList[index].fontSize)
-    },
-    setTheme (index) {
-      this.$emit('setTheme', index)
-    },
-    progressChange (e) {
-      this.$emit('progressChange', e.target.value)
-    },
-    progressInput (e) {
-      this.progress = e.target.value
-    },
-    toggleContent () {
-      this.contentShow = true
-    },
-    hideContent () {
-      this.contentShow = false
-    },
-    goContent (href) {
-      this.$emit('goContent', href)
-      this.hideContent()
-      this.hideChildMenu()
+      showTag.value = tag
+    }
+
+    const hideChildMenu = () => {
+      childMenuShow.value = false
+    }
+
+    const setFontSize = (index) => {
+      selectFont.value = index
+      emit('setFontSize', props.fontSizeList[index].fontSize)
+    }
+
+    const setTheme = (index) => {
+      emit('setTheme', index)
+    }
+
+    const progressChange = (e) => {
+      emit('progressChange', e.target.value)
+    }
+
+    const progressInput = (e) => {
+      progress.value = e.target.value
+    }
+
+    const openContent = () => {
+      contentShow.value = true
+    }
+
+    const hideContent = () => {
+      contentShow.value = false
+    }
+
+    const goContent = (href) => {
+      emit('goContent', href)
+      hideContent()
+      hideChildMenu()
+    }
+
+    return {
+      childMenuShow,
+      selectFont,
+      showTag,
+      progress,
+      contentShow,
+      toggleSet,
+      hideChildMenu,
+      setFontSize,
+      setTheme,
+      progressChange,
+      progressInput,
+      openContent,
+      hideContent,
+      goContent
     }
   }
 }
