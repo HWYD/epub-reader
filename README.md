@@ -14,6 +14,7 @@ npm run serve 或 yarn serve
 
 并使用vue的transiton实现动画效果
 
+有关内容借鉴了慕课网web前端工程师sam的epubjs电子书籍课程，https://www.imooc.com/learn/1038
 
 ## Project setup
 ```
