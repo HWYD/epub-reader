@@ -96,7 +96,7 @@ export default {
 
     const showBook = () => {
       const readerWidth = window.innerWidth > 799 ? '790px' : window.innerWidth
-      book.value = new Epub('/山海经.epub')
+      book.value = new Epub('/resource/book/山海经.epub')
       rendition.value = book.value.renderTo('reader', { width: readerWidth, height: window.innerHeight, method: 'default' })
       rendition.value.display()
       themeList.forEach(item => {
