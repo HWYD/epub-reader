@@ -135,6 +135,7 @@ export default {
     const setTheme = (index) => {
       defaultTheme.value = index
       rendition.value.themes.select(themeList[index].name)
+      document.body.style.backgroundColor = themeList[index].style.body.background
     }
 
     const setProgress = (e) => {
