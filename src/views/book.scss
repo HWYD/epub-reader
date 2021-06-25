@@ -16,12 +16,36 @@
     height: 100%;
     .left{
     flex: 0 0 20%;
+    display: flex;
+    @include flex-center;
+    .prePage{
+      display: none;
+    }
+    @media (any-hover: hover){
+      &:hover{
+        .prePage{
+          display: block;
+        }    
+      }
+    }
     }
     .center{
     flex: 1;
     }
     .right{
     flex: 0 0 20%;
+    display: flex;
+    @include flex-center;
+    .nextPage{
+      display: none;
+    }
+    @media (any-hover: hover){
+      &:hover{
+        .nextPage{
+          display: block;
+        }
+      }
+    }
     }
   }
 }

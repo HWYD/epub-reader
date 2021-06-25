@@ -2,9 +2,9 @@
   <div class="book-wrapper">
     <div id="reader" ></div>
     <div class="mask" ref="maskRef">
-      <div class="left" @click="prePage"></div>
+      <div class="left" @click="prePage"><span class="iconfont icon-shangyiye prePage"></span></div>
       <div class="center" @click="toggleMenu"></div>
-      <div class="right" @click="nextPage"></div>
+      <div class="right" @click="nextPage"><span class="iconfont icon-xiayiye nextPage"></span></div>
     </div>
     <book-menu ref="bookMenuRef"
               :menushow="menuShow"
